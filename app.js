@@ -1,7 +1,10 @@
 // Simple Express server (added to provide a local HTTP endpoint)
 const express = require('express');
 const app = express();
+// Respect environment PORT when deployed behind a reverse proxy (falls back to 3000)
 const port = process.env.PORT || 3000;
+// Ensure correct protocol/IP when behind Nginx or another proxy
+app.set('trust proxy', true);
 
 // Example in-repo value endpoint
 app.get('/', (req, res) => {
