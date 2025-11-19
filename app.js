@@ -1,32 +1,33 @@
-// Simple Express server (added to provide a local HTTP endpoint)
 const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
+
+const indexRouter = require('./routes/index');
+
 const app = express();
-// Respect environment PORT when deployed behind a reverse proxy (falls back to 3000)
 const port = process.env.PORT || 3000;
-// Ensure correct protocol/IP when behind Nginx or another proxy
+
 app.set('trust proxy', true);
 
-// Example in-repo value endpoint
-app.get('/', (req, res) => {
-	res.send('Hello from DIS-Eksamen-Gruppe20');
-});
+// Middleware
+app.use(morgan('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 
-app.get('/api/value', (req, res) => {
-	// preserve original example value
-	const a = 2;
-	res.json({ a });
+// Serve static assets from `public` (empty for now)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Routes
+app.use('/', indexRouter);
+
+// Fallback 404
+app.use((req, res) => {
+	res.status(404).send('Not Found');
 });
 
 app.listen(port, () => {
 	console.log(`Server listening on http://localhost:${port}`);
 });
-
-console.log("hej Team :D");
-
-console.log("celine er lidt klog")
-
-console.log("oliver er knap så klog")
-
-console.log("OST")
-
-console.log("oli er langsom") 
