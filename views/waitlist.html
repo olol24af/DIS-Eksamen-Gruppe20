@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Waitlist Confirmed</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>You're on the waitlist!</h1>
+      <p>Thanks for your interest in DIS-Eksamen-Gruppe20 retreats.</p>
+    </header>
+    <main>
+      <section>
+        <p>
+          We have recorded your request for <strong data-name>your reservation</strong> using the email
+          <strong data-email>your-email@example.com</strong>.
+        </p>
+        <p>
+          We'll reach out the moment a booking becomes available. Keep an eye on your inbox.
+        </p>
+        <a href="/">Back to booking info</a>
+      </section>
+    </main>
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const nameTarget = document.querySelector('[data-name]');
+        const emailTarget = document.querySelector('[data-email]');
+
+        if (nameTarget) {
+          const value = params.get('name');
+          nameTarget.textContent = value ? value : 'your reservation';
+        }
+
+        if (emailTarget) {
+          const value = params.get('email');
+          emailTarget.textContent = value ? value : 'your email address';
+        }
+
+        if (window.history && window.history.replaceState && params.toString()) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -1,33 +1,40 @@
+const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const morgan = require('morgan');
+const logger = require('morgan');
 
 const indexRouter = require('./routes/index');
+const { renderErrorPage } = require('./views/pages');
 
 const app = express();
-const port = process.env.PORT || 3000;
 
-app.set('trust proxy', true);
-
-// Middleware
-app.use(morgan('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
-// Serve static assets from `public` (empty for now)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
 app.use('/', indexRouter);
 
-// Fallback 404
-app.use((req, res) => {
-	res.status(404).send('Not Found');
+// catch 404 and forward to error handler
+app.use(function (req, res, next) {
+	next(createError(404));
 });
 
-app.listen(port, () => {
-	console.log(`Server listening on http://localhost:${port}`);
+// error handler
+app.use(function (err, req, res, next) {
+	const status = err.status || 500;
+	const stack = req.app.get('env') === 'development' ? err.stack : '';
+
+	res.status(status).send(
+		renderErrorPage({
+			title: 'Something went wrong',
+			message: err.message || 'Unexpected error',
+			status,
+			stack,
+		})
+	);
 });
+
+module.exports = app;

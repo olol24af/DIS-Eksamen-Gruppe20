@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Something went wrong</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Oops! Something went wrong.</h1>
+      <p>We couldn't complete that request.</p>
+    </header>
+    <main>
+      <section>
+        <h2 data-error-message>We couldn't complete that request.</h2>
+        <p data-error-status></p>
+        <pre data-error-stack hidden></pre>
+        <a href="/">Return to booking page</a>
+      </section>
+    </main>
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const message = params.get('message');
+        const status = params.get('status');
+        const stack = params.get('stack');
+
+        const messageTarget = document.querySelector('[data-error-message]');
+        if (messageTarget && message) {
+          messageTarget.textContent = message;
+        }
+
+        const statusTarget = document.querySelector('[data-error-status]');
+        if (statusTarget) {
+          statusTarget.textContent = status ? `Status: ${status}` : '';
+        }
+
+        const stackTarget = document.querySelector('[data-error-stack]');
+        if (stackTarget && stack) {
+          stackTarget.textContent = stack;
+          stackTarget.hidden = false;
+        }
+
+        if (window.history && window.history.replaceState && params.toString()) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      })();
+    </script>
+  </body>
+</html>

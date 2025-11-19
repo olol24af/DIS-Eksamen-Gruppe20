@@ -3,9 +3,79 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DIS-Eksamen-Gruppe20</title>
+    <title>DIS-Eksamen-Gruppe20 Booking</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
   </head>
   <body>
-    <h1>hello from DIS-Eksamen-Gruppe20</h1>
+    <header>
+      <h1>Welcome to DIS-Eksamen-Gruppe20</h1>
+      <p>
+        You've discovered us <span data-visit-count>1</span> time<span data-visit-plural>s</span> - glad you're back!
+      </p>
+    </header>
+    <main>
+      <section>
+        <h2>Copenhagen Gin Distillery</h2>
+        <p>Join us for a night in the Danish countryside with immersive gin workshops,</p>
+        <p><strong>Dates:</strong> 12 - 15 March 2026</p>
+        <p><strong>Host:</strong> DIS-Eksamen-Gruppe20</p>
+      </section>
+
+      <section class="cta">
+        <h3>No spots left? Join the waitlist.</h3>
+        <p>
+          Add yourself to the waitlist and be the first to know when a reservation opens up. We'll notify you instantly.
+        </p>
+        <form method="post" action="/waitlist">
+          <label>
+            Full name
+            <input type="text" name="fullName" required />
+          </label>
+          <label>
+            Email
+            <input type="email" name="email" required />
+          </label>
+          <button type="submit">Join the Waitlist</button>
+        </form>
+        <div class="error" data-error hidden></div>
+      </section>
+    </main>
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const nameField = document.querySelector('input[name="fullName"]');
+        const emailField = document.querySelector('input[name="email"]');
+        const visitsTarget = document.querySelector('[data-visit-count]');
+        const pluralTarget = document.querySelector('[data-visit-plural]');
+        const errorBox = document.querySelector('[data-error]');
+
+        if (nameField) {
+          nameField.value = params.get('name') || '';
+        }
+
+        if (emailField) {
+          emailField.value = params.get('email') || '';
+        }
+
+        const errorMessage = params.get('error');
+        if (errorMessage && errorBox) {
+          errorBox.textContent = errorMessage;
+          errorBox.hidden = false;
+        }
+
+        const cookieMatch = document.cookie.match(/(?:^|; )visited=([^;]*)/);
+        const visitCount = cookieMatch ? Number(decodeURIComponent(cookieMatch[1])) : 1;
+        if (visitsTarget) {
+          visitsTarget.textContent = String(Number.isFinite(visitCount) && visitCount > 0 ? visitCount : 1);
+        }
+        if (pluralTarget) {
+          pluralTarget.textContent = visitCount === 1 ? '' : 's';
+        }
+
+        if (window.history && window.history.replaceState && params.toString()) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      })();
+    </script>
   </body>
 </html>
