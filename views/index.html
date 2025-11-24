@@ -8,17 +8,25 @@
   </head>
   <body>
     <header>
-      <h1>Welcome to DIS-Eksamen-Gruppe20</h1>
-      <p>
-        You've discovered us <span data-visit-count>1</span> time<span data-visit-plural>s</span> - glad you're back!
-      </p>
+      <div class="header__inner">
+        <div class="header__logo" data-hero-wrapper>
+          <img data-hero-image alt="Retreat preview" loading="lazy" hidden />
+          <div class="notice" data-hero-fallback hidden>
+            We are setting up your experience preview. Please refresh if the image does not appear.
+          </div>
+        </div>
+        <div class="header__copy">
+          <h1>Welcome to DIS-Eksamen-Gruppe20</h1>
+          <p>
+            You've discovered us <span data-visit-count>1</span> time<span data-visit-plural>s</span> - glad you're back!
+          </p>
+        </div>
+      </div>
     </header>
     <main>
       <section>
         <h2>Copenhagen Gin Distillery</h2>
         <p>Join us for a night in the Danish countryside with immersive gin workshops,</p>
-        <p><strong>Dates:</strong> 12 - 15 March 2026</p>
-        <p><strong>Host:</strong> DIS-Eksamen-Gruppe20</p>
       </section>
 
       <section class="calendar" aria-label="Retreat availability calendar">
@@ -59,12 +67,6 @@
             Select a date above to check its status and join the waitlist when the trip opens up.
           </p>
           <div class="cta__grid">
-            <div class="hero" data-hero-wrapper>
-              <img data-hero-image alt="Retreat preview" loading="lazy" hidden />
-              <div class="notice" data-hero-fallback hidden>
-                We are setting up your experience preview. Please refresh if the image does not appear.
-              </div>
-            </div>
             <form method="post" action="/waitlist" class="cta__form">
               <label>
                 Full name
