@@ -24,7 +24,8 @@
       <section class="cta">
         <h3>No spots left? Join the waitlist.</h3>
         <p>
-          Add yourself to the waitlist and be the first to know when a reservation opens up. We'll notify you instantly.
+          Add yourself to the waitlist and be the first to know when a reservation opens up. We'll text you as soon as a
+          spot becomes available.
         </p>
         <div class="cta__grid">
           <div class="hero" data-hero-wrapper>
@@ -39,8 +40,8 @@
               <input type="text" name="fullName" required />
             </label>
             <label>
-              Email
-              <input type="email" name="email" required />
+              Mobile number
+              <input type="tel" name="phone" inputmode="tel" pattern="[\d+\s()-]{5,}" placeholder="e.g. +45 12 34 56 78" required />
             </label>
             <button type="submit">Join the Waitlist</button>
           </form>
@@ -52,7 +53,7 @@
       (function () {
         const params = new URLSearchParams(window.location.search);
         const nameField = document.querySelector('input[name="fullName"]');
-        const emailField = document.querySelector('input[name="email"]');
+        const phoneField = document.querySelector('input[name="phone"]');
         const visitsTarget = document.querySelector('[data-visit-count]');
         const pluralTarget = document.querySelector('[data-visit-plural]');
         const errorBox = document.querySelector('[data-error]');
@@ -64,8 +65,8 @@
           nameField.value = params.get('name') || '';
         }
 
-        if (emailField) {
-          emailField.value = params.get('email') || '';
+        if (phoneField) {
+          phoneField.value = params.get('phone') || '';
         }
 
         const errorMessage = params.get('error');

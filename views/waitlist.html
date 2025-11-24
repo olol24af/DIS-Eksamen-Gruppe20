@@ -14,11 +14,11 @@
     <main>
       <section>
         <p>
-          We have recorded your request for <strong data-name>your reservation</strong> using the email
-          <strong data-email>your-email@example.com</strong>.
+          We have recorded your request for <strong data-name>your reservation</strong> using the mobile number
+          <strong data-phone>your phone number</strong>.
         </p>
         <p>
-          We'll reach out the moment a booking becomes available. Keep an eye on your inbox.
+          We'll text you as soon as a booking becomes available. Keep an eye on your phone.
         </p>
         <a href="/">Back to booking info</a>
       </section>
@@ -27,16 +27,16 @@
       (function () {
         const params = new URLSearchParams(window.location.search);
         const nameTarget = document.querySelector('[data-name]');
-        const emailTarget = document.querySelector('[data-email]');
+        const phoneTarget = document.querySelector('[data-phone]');
 
         if (nameTarget) {
           const value = params.get('name');
           nameTarget.textContent = value ? value : 'your reservation';
         }
 
-        if (emailTarget) {
-          const value = params.get('email');
-          emailTarget.textContent = value ? value : 'your email address';
+        if (phoneTarget) {
+          const value = params.get('phone');
+          phoneTarget.textContent = value ? value : 'your phone number';
         }
 
         if (window.history && window.history.replaceState && params.toString()) {

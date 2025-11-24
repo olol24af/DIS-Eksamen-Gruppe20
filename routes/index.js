@@ -28,26 +28,28 @@ router.get('/waitlist', (req, res) => {
 });
 
 router.post('/waitlist', async (req, res, next) => {
-	const { fullName = '', email = '' } = req.body;
+	const { fullName = '', phone = '' } = req.body;
 	const trimmedName = fullName.trim();
-	const trimmedEmail = email.trim();
+	const trimmedPhone = phone.trim();
+	const digitsOnly = trimmedPhone.replace(/\D/g, '');
+	const normalizedPhone = trimmedPhone.startsWith('+') ? `+${digitsOnly}` : digitsOnly;
 
-	if (!trimmedName || !trimmedEmail) {
+	if (!trimmedName || !normalizedPhone || normalizedPhone.length < 5) {
 		const params = new URLSearchParams({
-			error: 'Please provide both your name and email to join the waitlist.',
+			error: 'Please provide both your name and a valid phone number to join the waitlist.',
 			name: trimmedName,
-			email: trimmedEmail,
+			phone: trimmedPhone,
 		});
 		return res.redirect(303, `/?${params.toString()}`);
 	}
 
 	try {
-		await addWaitlistEntry({ fullName: trimmedName, email: trimmedEmail });
+		await addWaitlistEntry({ fullName: trimmedName, phone: normalizedPhone });
 	} catch (error) {
 		return next(error);
 	}
 
-	const params = new URLSearchParams({ name: trimmedName, email: trimmedEmail });
+	const params = new URLSearchParams({ name: trimmedName, phone: trimmedPhone });
 	return res.redirect(303, `/waitlist?${params.toString()}`);
 });
 

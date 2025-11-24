@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+  </head>
+  <body>
+    <main class="admin">
+      <section>
+        <h1>Admin Access</h1>
+        <p>Please sign in to manage waitlist notifications.</p>
+        <form method="post" action="/admin/login" class="admin__form">
+          <label>
+            Username
+            <input type="text" name="username" autocomplete="username" required />
+          </label>
+          <label>
+            Password
+            <input type="password" name="password" autocomplete="current-password" required />
+          </label>
+          <button type="submit">Sign in</button>
+        </form>
+        <div class="error" data-error hidden></div>
+      </section>
+    </main>
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const errorMessage = params.get('error');
+        const errorBox = document.querySelector('[data-error]');
+
+        if (errorMessage && errorBox) {
+          errorBox.textContent = errorMessage;
+          errorBox.hidden = false;
+        }
+
+        if (window.history && window.history.replaceState && params.toString()) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      })();
+    </script>
+  </body>
+</html>

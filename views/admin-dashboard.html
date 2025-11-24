@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+  </head>
+  <body>
+    <main class="admin">
+      <section>
+        <h1>Waitlist Controls</h1>
+        <p>Trigger a notification for the next guest in line.</p>
+        <form method="post" action="/admin/open" class="admin__form">
+          <button type="submit">Notify next guest</button>
+        </form>
+        <div class="notice" data-message hidden></div>
+        <div class="error" data-error hidden></div>
+        <form method="post" action="/admin/logout" class="admin__form admin__form--secondary">
+          <button type="submit">Sign out</button>
+        </form>
+      </section>
+    </main>
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const message = params.get('message');
+        const errorMessage = params.get('error');
+        const messageBox = document.querySelector('[data-message]');
+        const errorBox = document.querySelector('[data-error]');
+
+        if (message && messageBox) {
+          messageBox.textContent = message;
+          messageBox.hidden = false;
+        }
+
+        if (errorMessage && errorBox) {
+          errorBox.textContent = errorMessage;
+          errorBox.hidden = false;
+        }
+
+        if (window.history && window.history.replaceState && params.toString()) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      })();
+    </script>
+  </body>
+</html>
