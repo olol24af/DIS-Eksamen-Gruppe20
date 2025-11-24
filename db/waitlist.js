@@ -11,6 +11,11 @@ const database = new sqlite3.Database(databasePath, (err) => {
 	if (err) {
 		// Bubble the error so the server fails fast instead of running without persistence.
 		throw err;
+	} else {
+		// Enable WAL mode for better concurrency in PM2 Cluster Mode
+		database.run('PRAGMA journal_mode = WAL;', (pragmaErr) => {
+			if (pragmaErr) console.error('Failed to enable WAL mode:', pragmaErr);
+		});
 	}
 });
 
