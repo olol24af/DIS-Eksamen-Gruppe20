@@ -1,8 +1,8 @@
 const twilio = require('twilio');
 
-const accountSid = process.env.TWILIO_ACCOUNT_SID || 'AC9e176e8e83124f1675e0314d31cbccb9';
-const authToken = process.env.TWILIO_AUTH_TOKEN || '804ee8717a4da23f55baa2997ff9c91a';
-const fromNumber = process.env.TWILIO_FROM_NUMBER || '+19789513852';
+const accountSid = process.env.TWILIO_ACCOUNT_SID || 'XXXX';
+const authToken = process.env.TWILIO_AUTH_TOKEN || 'XXXX';
+const fromNumber = process.env.TWILIO_FROM_NUMBER || 'XXXX';
 
 const isPlaceholder = (value) => value === 'XXXX' || value === '' || typeof value === 'undefined';
 const isTwilioConfigured = ![accountSid, authToken, fromNumber].some(isPlaceholder);
