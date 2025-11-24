@@ -21,42 +21,74 @@
         <p><strong>Host:</strong> DIS-Eksamen-Gruppe20</p>
       </section>
 
-      <section class="cta">
-        <h3>No spots left? Join the waitlist.</h3>
-        <p>
-          Add yourself to the waitlist and be the first to know when a reservation opens up. We'll text you as soon as a
-          spot becomes available.
-        </p>
-        <div class="cta__grid">
-          <div class="hero" data-hero-wrapper>
-            <img data-hero-image alt="Retreat preview" loading="lazy" hidden />
-            <div class="notice" data-hero-fallback hidden>
-              We are setting up your experience preview. Please refresh if the image does not appear.
-            </div>
-          </div>
-          <form method="post" action="/waitlist" class="cta__form">
-            <label>
-              Full name
-              <input type="text" name="fullName" required />
-            </label>
-            <label>
-              Country code
-              <select name="countryCode" data-country-select required>
-                <option value="+45">(+45) Denmark</option>
-                <option value="+1">(+1) United States</option>
-                <option value="+44">(+44) United Kingdom</option>
-                <option value="+33">(+33) France</option>
-                <option value="+49">(+49) Germany</option>
-              </select>
-            </label>
-            <label>
-              Phone number
-              <input type="tel" name="phone" inputmode="tel" pattern="[0-9\s()-]{5,}" placeholder="12 34 56 78" required />
-            </label>
-            <button type="submit">Join the Waitlist</button>
-          </form>
+      <section class="calendar" aria-label="Retreat availability calendar">
+        <div class="calendar__header">
+          <button type="button" class="calendar__nav" data-calendar-prev aria-label="Previous month">
+            &#8249;
+          </button>
+          <h3 class="calendar__title" data-calendar-label>Month YYYY</h3>
+          <button type="button" class="calendar__nav" data-calendar-next aria-label="Next month">
+            &#8250;
+          </button>
         </div>
-        <div class="error" data-error hidden></div>
+        <div class="calendar__weekdays" aria-hidden="true">
+          <span>Mon</span>
+          <span>Tue</span>
+          <span>Wed</span>
+          <span>Thu</span>
+          <span>Fri</span>
+          <span>Sat</span>
+          <span>Sun</span>
+        </div>
+        <div class="calendar__days" data-calendar-days></div>
+        <div class="calendar__focus" data-calendar-focus hidden>
+          <div class="calendar__focus-content">
+            <h4 data-calendar-focus-label>Fully booked</h4>
+            <p data-calendar-focus-message>
+              Select a date to see detailed availability.
+            </p>
+            <button type="button" class="calendar__focus-back" data-calendar-focus-back>
+              Back to calendar
+            </button>
+          </div>
+        </div>
+        <p class="calendar__legend">All dates are currently fully booked. Join the waitlist for a chance to get in.</p>
+        <div class="cta" data-waitlist-container hidden>
+          <h3>No spots left? Join the waitlist.</h3>
+          <p data-booking-status>
+            Select a date above to check its status and join the waitlist when the trip opens up.
+          </p>
+          <div class="cta__grid">
+            <div class="hero" data-hero-wrapper>
+              <img data-hero-image alt="Retreat preview" loading="lazy" hidden />
+              <div class="notice" data-hero-fallback hidden>
+                We are setting up your experience preview. Please refresh if the image does not appear.
+              </div>
+            </div>
+            <form method="post" action="/waitlist" class="cta__form">
+              <label>
+                Full name
+                <input type="text" name="fullName" required />
+              </label>
+              <label>
+                Country code
+                <select name="countryCode" data-country-select required>
+                  <option value="+45">(+45) Denmark</option>
+                  <option value="+1">(+1) United States</option>
+                  <option value="+44">(+44) United Kingdom</option>
+                  <option value="+33">(+33) France</option>
+                  <option value="+49">(+49) Germany</option>
+                </select>
+              </label>
+              <label>
+                Phone number
+                <input type="tel" name="phone" inputmode="tel" pattern="[0-9\s()-]{5,}" placeholder="12 34 56 78" required />
+              </label>
+              <button type="submit">Join the Waitlist</button>
+            </form>
+          </div>
+          <div class="error" data-error hidden></div>
+        </div>
       </section>
     </main>
     <script>
@@ -71,6 +103,34 @@
         const heroImage = document.querySelector('[data-hero-image]');
         const heroWrapper = document.querySelector('[data-hero-wrapper]');
         const heroFallback = document.querySelector('[data-hero-fallback]');
+        const bookingStatus = document.querySelector('[data-booking-status]');
+        const waitlistContainer = document.querySelector('[data-waitlist-container]');
+        const defaultBookingCopy = bookingStatus ? bookingStatus.textContent.trim() : '';
+        const calendarContainer = document.querySelector('.calendar');
+        const calendarLabel = document.querySelector('[data-calendar-label]');
+        const calendarWeekdays = document.querySelector('.calendar__weekdays');
+        const calendarDays = document.querySelector('[data-calendar-days]');
+        const calendarPrev = document.querySelector('[data-calendar-prev]');
+        const calendarNext = document.querySelector('[data-calendar-next]');
+        const calendarFocus = document.querySelector('[data-calendar-focus]');
+        const calendarFocusLabel = document.querySelector('[data-calendar-focus-label]');
+        const calendarFocusMessage = document.querySelector('[data-calendar-focus-message]');
+        const calendarFocusBack = document.querySelector('[data-calendar-focus-back]');
+        const calendarLegend = document.querySelector('.calendar__legend');
+
+        const hideWaitlist = () => {
+          if (waitlistContainer) {
+            waitlistContainer.hidden = true;
+          }
+        };
+
+        const showWaitlist = () => {
+          if (waitlistContainer) {
+            waitlistContainer.hidden = false;
+          }
+        };
+
+        hideWaitlist();
 
         if (nameField) {
           nameField.value = params.get('name') || '';
@@ -105,6 +165,10 @@
         if (errorMessage && errorBox) {
           errorBox.textContent = errorMessage;
           errorBox.hidden = false;
+          showWaitlist();
+          if (bookingStatus) {
+            bookingStatus.textContent = 'Please correct the highlighted fields and resubmit to join the waitlist.';
+          }
         }
 
         const cookieMatch = document.cookie.match(/(?:^|; )visited=([^;]*)/);
@@ -118,6 +182,174 @@
 
         if (window.history && window.history.replaceState && params.toString()) {
           window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        if (calendarLabel && calendarDays) {
+          const calendarState = {
+            offset: 0,
+            isFocused: false,
+          };
+
+          const formatMonthYear = (date) =>
+            date.toLocaleDateString(undefined, {
+              month: 'long',
+              year: 'numeric',
+            });
+
+          const focusMessage = (label) =>
+            `${label} is fully booked. Add yourself to the waitlist and we'll notify you if a space opens.`;
+
+          const updateNavState = () => {
+            if (calendarPrev) {
+              calendarPrev.disabled = calendarState.isFocused || calendarState.offset === 0;
+            }
+            if (calendarNext) {
+              calendarNext.disabled = calendarState.isFocused;
+            }
+          };
+
+          const exitFocus = () => {
+            if (!calendarState.isFocused) {
+              hideWaitlist();
+              return;
+            }
+            calendarState.isFocused = false;
+            if (calendarDays) {
+              calendarDays.hidden = false;
+            }
+            if (calendarWeekdays) {
+              calendarWeekdays.hidden = false;
+            }
+            if (calendarFocus) {
+              calendarFocus.hidden = true;
+            }
+            if (calendarLegend) {
+              calendarLegend.hidden = false;
+            }
+            if (calendarContainer) {
+              calendarContainer.classList.remove('calendar--focused');
+            }
+            if (bookingStatus) {
+              bookingStatus.textContent = defaultBookingCopy || 'Select a date above to check its status and join the waitlist when the trip opens up.';
+            }
+            hideWaitlist();
+            updateNavState();
+          };
+
+          const showFocus = (label) => {
+            calendarState.isFocused = true;
+            if (calendarDays) {
+              calendarDays.hidden = true;
+            }
+            if (calendarWeekdays) {
+              calendarWeekdays.hidden = true;
+            }
+            if (calendarLegend) {
+              calendarLegend.hidden = true;
+            }
+            if (calendarFocusLabel) {
+              calendarFocusLabel.textContent = label;
+            }
+            if (calendarFocusMessage) {
+              calendarFocusMessage.textContent = focusMessage(label);
+            }
+            if (calendarFocus) {
+              calendarFocus.hidden = false;
+            }
+            if (calendarContainer) {
+              calendarContainer.classList.add('calendar--focused');
+            }
+            if (bookingStatus) {
+              bookingStatus.textContent = `${label} is fully booked. Add yourself to the waitlist below.`;
+            }
+            showWaitlist();
+            updateNavState();
+          };
+
+          const renderCalendar = () => {
+            exitFocus();
+
+            const base = new Date();
+            base.setDate(1);
+            base.setHours(0, 0, 0, 0);
+            base.setMonth(base.getMonth() + calendarState.offset);
+
+            const year = base.getFullYear();
+            const month = base.getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDay = new Date(year, month, 1);
+            const startOffset = (firstDay.getDay() + 6) % 7; // Shift so Monday is first column.
+
+            calendarLabel.textContent = formatMonthYear(base);
+            calendarDays.innerHTML = '';
+
+            for (let i = 0; i < 42; i += 1) {
+              const cell = document.createElement('div');
+              cell.classList.add('calendar__cell');
+
+              const dayNumber = i - startOffset + 1;
+              if (i < startOffset || dayNumber > daysInMonth) {
+                cell.classList.add('calendar__cell--empty');
+                calendarDays.appendChild(cell);
+                continue;
+              }
+
+              const date = new Date(year, month, dayNumber);
+              const label = date.toLocaleDateString(undefined, {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              });
+
+              cell.classList.add('calendar__cell--booked');
+              cell.setAttribute('aria-label', `${label}. Fully booked.`);
+              cell.dataset.statusLabel = label;
+
+              const dateEl = document.createElement('span');
+              dateEl.classList.add('calendar__date');
+              dateEl.textContent = dayNumber;
+
+              const statusEl = document.createElement('span');
+              statusEl.classList.add('calendar__status');
+              statusEl.textContent = 'Fully booked';
+
+              cell.appendChild(dateEl);
+              cell.appendChild(statusEl);
+
+              cell.addEventListener('click', () => {
+                showFocus(label);
+              });
+
+              calendarDays.appendChild(cell);
+            }
+
+            updateNavState();
+          };
+
+          if (calendarFocusBack) {
+            calendarFocusBack.addEventListener('click', () => {
+              exitFocus();
+            });
+          }
+
+          if (calendarPrev) {
+            calendarPrev.addEventListener('click', () => {
+              if (calendarState.offset > 0) {
+                calendarState.offset -= 1;
+                renderCalendar();
+              }
+            });
+          }
+
+          if (calendarNext) {
+            calendarNext.addEventListener('click', () => {
+              calendarState.offset += 1;
+              renderCalendar();
+            });
+          }
+
+          renderCalendar();
         }
 
         if (heroImage) {
