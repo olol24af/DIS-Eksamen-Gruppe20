@@ -23,4 +23,7 @@ yarn.lock
 .vscode/
 *.sublime-workspace
 *.sublime-project
-data/*.db
+*.db
+*.db-wal
+*.db-shm
+data/.db
