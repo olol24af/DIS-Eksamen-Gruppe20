@@ -1,7 +1,7 @@
 const { sendTextMessage, isTwilioConfigured } = require('../config/twilio');
 
 const availabilityMessage = ({ fullName }) =>
-	`Hi ${fullName || 'there'}! A space just opened up for the DIS-Eksamen-Gruppe20 retreat. Reply to confirm your reservation.`;
+	`[TEST KKE SVAR PÅ BESKEDEDEN, DET KOSTER $$$] Hi ${fullName || 'there'}! A space just opened up for the DIS-Eksamen-Gruppe20 retreat. Reply to confirm your reservation.`;
 
 const sendAvailabilityNotification = async ({ fullName, phone }) => {
 	if (!phone) {
