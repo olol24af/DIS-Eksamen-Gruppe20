@@ -26,17 +26,25 @@
         <p>
           Add yourself to the waitlist and be the first to know when a reservation opens up. We'll notify you instantly.
         </p>
-        <form method="post" action="/waitlist">
-          <label>
-            Full name
-            <input type="text" name="fullName" required />
-          </label>
-          <label>
-            Email
-            <input type="email" name="email" required />
-          </label>
-          <button type="submit">Join the Waitlist</button>
-        </form>
+        <div class="cta__grid">
+          <div class="hero" data-hero-wrapper>
+            <img data-hero-image alt="Retreat preview" loading="lazy" hidden />
+            <div class="notice" data-hero-fallback hidden>
+              We are setting up your experience preview. Please refresh if the image does not appear.
+            </div>
+          </div>
+          <form method="post" action="/waitlist" class="cta__form">
+            <label>
+              Full name
+              <input type="text" name="fullName" required />
+            </label>
+            <label>
+              Email
+              <input type="email" name="email" required />
+            </label>
+            <button type="submit">Join the Waitlist</button>
+          </form>
+        </div>
         <div class="error" data-error hidden></div>
       </section>
     </main>
@@ -48,6 +56,9 @@
         const visitsTarget = document.querySelector('[data-visit-count]');
         const pluralTarget = document.querySelector('[data-visit-plural]');
         const errorBox = document.querySelector('[data-error]');
+        const heroImage = document.querySelector('[data-hero-image]');
+        const heroWrapper = document.querySelector('[data-hero-wrapper]');
+        const heroFallback = document.querySelector('[data-hero-fallback]');
 
         if (nameField) {
           nameField.value = params.get('name') || '';
@@ -74,6 +85,26 @@
 
         if (window.history && window.history.replaceState && params.toString()) {
           window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        if (heroImage) {
+          fetch('/api/cdn/hero')
+            .then((response) => (response.ok ? response.json() : Promise.reject(new Error('Failed to load CDN url'))))
+            .then(({ url }) => {
+              if (!url) {
+                throw new Error('Missing CDN url');
+              }
+              heroImage.src = url;
+              heroImage.hidden = false;
+              heroImage.addEventListener('error', () => {
+                heroImage.hidden = true;
+                if (heroFallback) heroFallback.hidden = false;
+              });
+            })
+            .catch(() => {
+              if (heroWrapper) heroWrapper.classList.add('hero--unavailable');
+              if (heroFallback) heroFallback.hidden = false;
+            });
         }
       })();
     </script>

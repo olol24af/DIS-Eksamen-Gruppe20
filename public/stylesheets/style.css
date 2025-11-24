@@ -6,11 +6,55 @@ body {
   color: #222;
 }
 
+
+.cta__grid {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  margin-top: 1.5rem;
+}
 header {
   background-color: #003459;
   color: #fff;
   padding: 2rem 1rem;
   text-align: center;
+}
+
+.hero {
+  flex: 1 1 320px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+  background-color: #001c2d;
+  min-width: 280px;
+}
+
+.hero img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.hero--unavailable {
+  border: 1px dashed rgba(255, 255, 255, 0.6);
+  padding: 1rem;
+}
+
+.cta__form {
+  flex: 1 1 320px;
+  min-width: 280px;
+}
+
+@media (max-width: 700px) {
+  .cta__grid {
+    flex-direction: column;
+  }
+
+  .hero,
+  .cta__form {
+    width: 100%;
+  }
 }
 
 main {

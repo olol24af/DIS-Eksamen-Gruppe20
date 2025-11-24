@@ -2,11 +2,16 @@ const express = require('express');
 const path = require('path');
 
 const { addWaitlistEntry } = require('../db/waitlist');
+const { getHeroImageUrl } = require('../config/cloudinary');
 
 const router = express.Router();
 
 const indexPagePath = path.join(__dirname, '../views/index.html');
 const waitlistPagePath = path.join(__dirname, '../views/waitlist.html');
+
+router.get('/api/cdn/hero', (req, res) => {
+	return res.json({ url: getHeroImageUrl() });
+});
 
 router.get('/', (req, res) => {
 	const visits = Number(req.cookies?.visited || 0) + 1;
