@@ -4,7 +4,8 @@
   "private": true,
   "main": "app.js",
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "restart": "npm i && pm2 restart all"
   },
   "dependencies": {
     "cloudinary": "^1.41.3",

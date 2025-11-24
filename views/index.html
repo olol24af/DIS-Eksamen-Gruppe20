@@ -40,8 +40,18 @@
               <input type="text" name="fullName" required />
             </label>
             <label>
-              Mobile number
-              <input type="tel" name="phone" inputmode="tel" pattern="[\d+\s()-]{5,}" placeholder="e.g. +45 12 34 56 78" required />
+              Country code
+              <select name="countryCode" data-country-select required>
+                <option value="+45">(+45) Denmark</option>
+                <option value="+1">(+1) United States</option>
+                <option value="+44">(+44) United Kingdom</option>
+                <option value="+33">(+33) France</option>
+                <option value="+49">(+49) Germany</option>
+              </select>
+            </label>
+            <label>
+              Phone number
+              <input type="tel" name="phone" inputmode="tel" pattern="[0-9\s()-]{5,}" placeholder="12 34 56 78" required />
             </label>
             <button type="submit">Join the Waitlist</button>
           </form>
@@ -54,6 +64,7 @@
         const params = new URLSearchParams(window.location.search);
         const nameField = document.querySelector('input[name="fullName"]');
         const phoneField = document.querySelector('input[name="phone"]');
+        const countrySelect = document.querySelector('[data-country-select]');
         const visitsTarget = document.querySelector('[data-visit-count]');
         const pluralTarget = document.querySelector('[data-visit-plural]');
         const errorBox = document.querySelector('[data-error]');
@@ -65,8 +76,29 @@
           nameField.value = params.get('name') || '';
         }
 
+        const existingCountry = params.get('phoneCountry');
+        const existingLocal = params.get('phoneLocal');
+        const combinedPhone = params.get('phone');
+
+        if (countrySelect) {
+          let selected = existingCountry || '+45';
+
+          if (!existingCountry && combinedPhone && combinedPhone.startsWith('+')) {
+            selected = combinedPhone.match(/^\+\d{1,4}/)?.[0] || selected;
+          }
+
+          const option = Array.from(countrySelect.options).find((opt) => opt.value === selected);
+          countrySelect.value = option ? option.value : '+45';
+        }
+
         if (phoneField) {
-          phoneField.value = params.get('phone') || '';
+          let localValue = existingLocal || '';
+
+          if (!localValue && combinedPhone) {
+            localValue = combinedPhone.replace(/^\+\d{1,4}/, '');
+          }
+
+          phoneField.value = localValue;
         }
 
         const errorMessage = params.get('error');

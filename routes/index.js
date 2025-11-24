@@ -28,17 +28,20 @@ router.get('/waitlist', (req, res) => {
 });
 
 router.post('/waitlist', async (req, res, next) => {
-	const { fullName = '', phone = '' } = req.body;
+	const { fullName = '', countryCode = '', phone: phoneLocal = '' } = req.body;
 	const trimmedName = fullName.trim();
-	const trimmedPhone = phone.trim();
-	const digitsOnly = trimmedPhone.replace(/\D/g, '');
-	const normalizedPhone = trimmedPhone.startsWith('+') ? `+${digitsOnly}` : digitsOnly;
+	const trimmedLocal = String(phoneLocal).trim();
+	const digitsCountry = String(countryCode).replace(/\D/g, '');
+	const normalizedCountry = digitsCountry ? `+${digitsCountry}` : '';
+	const localDigits = trimmedLocal.replace(/\D/g, '');
+	const normalizedPhone = normalizedCountry && localDigits ? `${normalizedCountry}${localDigits}` : '';
 
-	if (!trimmedName || !normalizedPhone || normalizedPhone.length < 5) {
+	if (!trimmedName || !normalizedPhone || normalizedPhone.length < 6) {
 		const params = new URLSearchParams({
-			error: 'Please provide both your name and a valid phone number to join the waitlist.',
+			error: 'Please provide your name and phone number, including country code.',
 			name: trimmedName,
-			phone: trimmedPhone,
+			phoneCountry: normalizedCountry,
+			phoneLocal: trimmedLocal,
 		});
 		return res.redirect(303, `/?${params.toString()}`);
 	}
@@ -49,7 +52,7 @@ router.post('/waitlist', async (req, res, next) => {
 		return next(error);
 	}
 
-	const params = new URLSearchParams({ name: trimmedName, phone: trimmedPhone });
+	const params = new URLSearchParams({ name: trimmedName, phone: normalizedPhone });
 	return res.redirect(303, `/waitlist?${params.toString()}`);
 });
 
