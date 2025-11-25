@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 
 const { database } = require('./waitlist');
 
@@ -22,8 +22,12 @@ const get = (sql, params = []) =>
 		});
 	});
 
-const hashPassword = (password) =>
-	crypto.createHash('sha256').update(String(password)).digest('hex');
+const DEFAULT_BCRYPT_ROUNDS = 12;
+const configuredRounds = Number.parseInt(process.env.BCRYPT_ROUNDS ?? `${DEFAULT_BCRYPT_ROUNDS}`, 10);
+const BCRYPT_ROUNDS = Number.isNaN(configuredRounds) ? DEFAULT_BCRYPT_ROUNDS : configuredRounds;
+
+const hashPassword = async (password) =>
+	bcrypt.hash(String(password), BCRYPT_ROUNDS);
 
 const ensureAdminUser = async () => {
 	await run(
@@ -35,15 +39,21 @@ const ensureAdminUser = async () => {
 		)`
 	);
 
-	const adminUsername = 'admin';
-	const adminPasswordHash = hashPassword('admin');
+	const adminUsername = process.env.ADMIN_USERNAME || 'admin';
+	const adminPassword = process.env.ADMIN_PASSWORD || 'admin';
+	const existingAdmin = await get(`SELECT id, password_hash FROM users WHERE username = ?`, [adminUsername]);
 
-	await run(
-		`INSERT INTO users (username, password_hash)
-		 VALUES (?, ?)
-		 ON CONFLICT(username) DO UPDATE SET password_hash = excluded.password_hash`,
-		[adminUsername, adminPasswordHash]
-	);
+	const passwordMatches = existingAdmin
+		? await bcrypt.compare(adminPassword, existingAdmin.password_hash)
+		: false;
+
+	if (!existingAdmin) {
+		const adminPasswordHash = await hashPassword(adminPassword);
+		await run(`INSERT INTO users (username, password_hash) VALUES (?, ?)`, [adminUsername, adminPasswordHash]);
+	} else if (!passwordMatches) {
+		const adminPasswordHash = await hashPassword(adminPassword);
+		await run(`UPDATE users SET password_hash = ? WHERE id = ?`, [adminPasswordHash, existingAdmin.id]);
+	}
 };
 
 const usersReady = ensureAdminUser().catch((err) => {
@@ -63,8 +73,8 @@ const validateUserCredentials = async (username, password) => {
 		return null;
 	}
 
-	const submittedHash = hashPassword(password);
-	if (submittedHash !== row.password_hash) {
+	const passwordIsValid = await bcrypt.compare(password, row.password_hash);
+	if (!passwordIsValid) {
 		return null;
 	}
 

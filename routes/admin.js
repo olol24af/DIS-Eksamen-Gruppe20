@@ -7,21 +7,21 @@ const {
 } = require('../db/waitlist');
 const { validateUserCredentials } = require('../db/users');
 const { sendAvailabilityNotification, isTwilioConfigured } = require('../services/notifications');
+const {
+	setAdminTokenCookie,
+	clearAdminTokenCookie,
+	requireAdminAuth,
+	decodeAdminToken,
+} = require('../middleware/auth');
 
 const router = express.Router();
 
 const loginPagePath = path.join(__dirname, '../views/admin-login.html');
 const dashboardPagePath = path.join(__dirname, '../views/admin-dashboard.html');
 
-const ensureAuthenticated = (req, res, next) => {
-	if (req.session?.isAdmin) {
-		return next();
-	}
-	return res.redirect('/admin/login');
-};
-
 router.get('/admin/login', (req, res) => {
-	if (req.session?.isAdmin) {
+	const adminUser = decodeAdminToken(req);
+	if (adminUser) {
 		return res.redirect('/admin');
 	}
 	return res.sendFile(loginPagePath);
@@ -36,9 +36,8 @@ router.post('/admin/login', async (req, res, next) => {
 			const params = new URLSearchParams({ error: 'Invalid username or password.' });
 			return res.redirect(`/admin/login?${params.toString()}`);
 		}
-
-		req.session.isAdmin = true;
-		req.session.username = user.username;
+ 
+		setAdminTokenCookie(res, { id: user.id, username: user.username });
 
 		return res.redirect('/admin');
 	} catch (error) {
@@ -47,23 +46,15 @@ router.post('/admin/login', async (req, res, next) => {
 });
 
 router.post('/admin/logout', (req, res) => {
-	const finish = () => {
-		res.clearCookie('connect.sid');
-		res.redirect('/admin/login');
-	};
-
-	if (req.session) {
-		req.session.destroy(() => finish());
-	} else {
-		finish();
-	}
+	clearAdminTokenCookie(res);
+	return res.redirect('/admin/login');
 });
 
-router.get('/admin', ensureAuthenticated, (req, res) => {
+router.get('/admin', requireAdminAuth, (req, res) => {
 	return res.sendFile(dashboardPagePath);
 });
 
-router.post('/admin/open', ensureAuthenticated, async (req, res, next) => {
+router.post('/admin/open', requireAdminAuth, async (req, res, next) => {
 	try {
 		if (!isTwilioConfigured) {
 			const params = new URLSearchParams({

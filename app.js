@@ -5,9 +5,6 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const session = require('express-session');
-// Load the memcached connector
-const MemcachedStore = require('connect-memcached')(session);
 
 const indexRouter = require('./routes/index');
 const adminRouter = require('./routes/admin');
@@ -19,25 +16,6 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
-// Configure Session with Memcached Store
-app.use(
-	session({
-		secret: process.env.SESSION_SECRET || 'super-secret-waitlist',
-		resave: false,
-		saveUninitialized: false,
-		store: new MemcachedStore({
-			// Default to localhost:11211 if not specified in .env
-			hosts: [process.env.MEMCACHED_HOST || '127.0.0.1:11211'],
-			secret: process.env.SESSION_SECRET || 'super-secret-waitlist' // Optional: encrypt session data
-		}),
-		cookie: {
-			sameSite: 'lax',
-			// Secure cookies require HTTPS, enable if running on production domain
-			// secure: process.env.NODE_ENV === 'production' 
-		},
-	})
-);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
