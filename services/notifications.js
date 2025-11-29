@@ -15,5 +15,4 @@ const sendAvailabilityNotification = async ({ fullName, phone }) => {
 module.exports = {
 	sendAvailabilityNotification,
 	isTwilioConfigured,
-	availabilityMessage,
 };

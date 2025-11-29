@@ -13,7 +13,6 @@ const {
 	requireAdminAuth,
 	decodeAdminToken,
 } = require('../middleware/auth');
-const logger = require('../config/logger');
 
 const router = express.Router();
 
@@ -34,49 +33,20 @@ router.post('/admin/login', async (req, res, next) => {
 	try {
 		const user = await validateUserCredentials(username.trim(), password);
 		if (!user) {
-			logger.info('admin.login.failed', {
-				method: req.method,
-				url: req.originalUrl,
-				username: username.trim(),
-				ip: req.ip,
-			});
-
 			const params = new URLSearchParams({ error: 'Invalid username or password.' });
-			if (req.accepts('json')) {
-				return res.status(401).json({ error: 'Invalid username or password.' });
-			}
 			return res.redirect(`/admin/login?${params.toString()}`);
 		}
-
+ 
 		setAdminTokenCookie(res, { id: user.id, username: user.username });
-		logger.info('admin.login.success', {
-			method: req.method,
-			url: req.originalUrl,
-			username: user.username,
-			ip: req.ip,
-		});
 
 		return res.redirect('/admin');
 	} catch (error) {
-		logger.error('admin.login.error', {
-			method: req.method,
-			url: req.originalUrl,
-			error: error.message,
-			stack: error.stack,
-		});
 		return next(error);
 	}
 });
 
 router.post('/admin/logout', (req, res) => {
-	const adminUser = decodeAdminToken(req);
 	clearAdminTokenCookie(res);
-	logger.info('admin.logout', {
-		method: req.method,
-		url: req.originalUrl,
-		username: adminUser?.username || 'unknown',
-		ip: req.ip,
-	});
 	return res.redirect('/admin/login');
 });
 
@@ -90,11 +60,6 @@ router.post('/admin/open', requireAdminAuth, async (req, res, next) => {
 			const params = new URLSearchParams({
 				error: 'Twilio is not configured. Set TWILIO credentials before notifying guests.',
 			});
-			logger.warn('admin.notify.twilio_missing', {
-				method: req.method,
-				url: req.originalUrl,
-				username: req.admin?.username,
-			});
 			return res.redirect(`/admin?${params.toString()}`);
 		}
 
@@ -104,35 +69,17 @@ router.post('/admin/open', requireAdminAuth, async (req, res, next) => {
 			const params = new URLSearchParams({
 				error: 'No waitlist entries available to notify.',
 			});
-			logger.info('admin.notify.empty_waitlist', {
-				method: req.method,
-				url: req.originalUrl,
-				username: req.admin?.username,
-			});
 			return res.redirect(`/admin?${params.toString()}`);
 		}
 
 		await sendAvailabilityNotification({ fullName: entry.fullName, phone: entry.phone });
 		await removeWaitlistEntry(entry.id);
-		logger.info('admin.notify.success', {
-			method: req.method,
-			url: req.originalUrl,
-			username: req.admin?.username,
-			waitlistEntryId: entry.id,
-		});
 
 		const params = new URLSearchParams({
 			message: `Notification sent to ${entry.fullName}.`,
 		});
 		return res.redirect(`/admin?${params.toString()}`);
 	} catch (error) {
-		logger.error('admin.notify.error', {
-			method: req.method,
-			url: req.originalUrl,
-			username: req.admin?.username,
-			error: error.message,
-			stack: error.stack,
-		});
 		return next(error);
 	}
 });
